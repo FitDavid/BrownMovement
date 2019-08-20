@@ -1,0 +1,75 @@
+#include "CircleVector.h"
+
+CircleVector::CircleVector(SDL_Renderer* renderer)
+    : mRenderer(renderer)
+{
+    SDL_Surface* circleSurface;
+    circleSurface = SDL_LoadBMP("circ.bmp");
+    if(circleSurface == NULL)
+        throw "File not found.";
+    diameter = circleSurface->w;
+    SDL_SetColorKey(circleSurface, SDL_TRUE, SDL_MapRGB(circleSurface->format, 0, 0xFF, 0xFF));
+    circleTexture = SDL_CreateTextureFromSurface(renderer, circleSurface);
+    SDL_FreeSurface(circleSurface);
+}
+
+CircleVector::~CircleVector()
+{
+    SDL_DestroyTexture(circleTexture);
+}
+
+bool CircleVector::haveCollided(Circle* circle_1, Circle* circle_2)
+{
+    // if distance squared less than diameter squared
+    if((double)(circle_1->posX - circle_2->posX) * (circle_1->posX - circle_2->posX) +
+            (circle_1->posY - circle_2->posY) * (circle_1->posY - circle_2->posY) <
+            diameter * diameter)
+    {
+        return true;
+    }
+    return false;
+}
+
+/**
+ * @brief Moves all the circles in the vector at constant velocity, checks for collisions with
+ * the screen border and other circles.
+ * @todo Collision detection with other circles is simple and unrealistic. The angle is not taken
+ * into account.
+ */
+void CircleVector::move()
+{
+    for(iterator it = begin(); it < end(); it++)
+    {
+        it->posX += it->velX;
+        it->posY += it->velY;
+        if(it->posX < diameter / 2 || it->posX > 800 - diameter / 2)
+        {
+            it->velX = -it->velX;
+        }
+        if(it->posY < diameter / 2 || it->posY > 600 - diameter / 2)
+        {
+            it->velY = -it->velY;
+        }
+    }
+	for(iterator it = begin(); it < end(); it++)
+	{
+    for(iterator it2 = it; it2 < end(); it2++)
+    {
+        if(haveCollided(it, it2))
+        {
+            double n_x, n_y; //< vector of mirror line
+            n_x = it->posX - it
+        }
+    }
+	}
+}
+
+void CircleVector::render()
+{
+    iterator _end = end();
+    for(iterator it = begin(); it < _end; it++)
+    {
+        SDL_Rect dst = { it->posX - diameter / 2, it->posY - diameter / 2, diameter, diameter };
+        SDL_RenderCopy(mRenderer, circleTexture, NULL, &dst);
+    }
+}
